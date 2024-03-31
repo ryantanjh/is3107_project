@@ -1,6 +1,6 @@
 import pandas as pd
 
-from fred import FredScapper
+from fred_scrapper import FredScapper
 
 
 def get_fred_gdp(start_date='2000-01-01', end_date='2020-01-01') -> pd.DataFrame:

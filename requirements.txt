@@ -1,5 +1,8 @@
 apache-airflow==2.8.4
 beautifulsoup4==4.12.3
 pandas==2.2.1
+pydantic==2.6.4
+numpy==1.26.4
 SQLAlchemy==1.4.52
 requests==2.31.0
+requests-cache==1.2.0
