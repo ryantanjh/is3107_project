@@ -1,0 +1,5 @@
+apache-airflow==2.8.4
+beautifulsoup4==4.12.3
+pandas==2.2.1
+SQLAlchemy==1.4.52
+requests==2.31.0
