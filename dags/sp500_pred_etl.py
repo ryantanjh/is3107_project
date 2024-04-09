@@ -27,27 +27,27 @@ with DAG('sp500_pred_etl',
             CREATE SCHEMA IF NOT EXISTS sp500_pred; 
             CREATE TABLE IF NOT EXISTS sp500_pred.sp500 (
                 id SERIAL PRIMARY KEY,
-                date DATE,
+                date DATE UNIQUE,
                 price FLOAT
             );
              CREATE TABLE IF NOT EXISTS sp500_pred.gdp (
                 id SERIAL PRIMARY KEY,
-                date DATE,
+                date DATE UNIQUE,
                 price FLOAT
             );
              CREATE TABLE IF NOT EXISTS sp500_pred.interest_rate (
                 id SERIAL PRIMARY KEY,
-                date DATE,
+                date DATE UNIQUE,
                 price FLOAT
             );
              CREATE TABLE IF NOT EXISTS sp500_pred.unrate (
                 id SERIAL PRIMARY KEY,
-                date DATE,
+                date DATE UNIQUE,
                 price FLOAT
             );
              CREATE TABLE IF NOT EXISTS sp500_pred.cpi (
                 id SERIAL PRIMARY KEY,
-                date DATE,
+                date DATE UNIQUE,
                 price FLOAT
             );
         """
