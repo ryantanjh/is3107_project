@@ -13,3 +13,10 @@ class YFinanceScrapper:
         data.insert(0, 'Ticker', ticker)
         data = data.reset_index()
         return data
+
+    def get_sp500_prices(self, start_date='2015-01-01', end_date='2024-02-28'):
+        """Returns dataframe containing sp500 adj close historical prices"""
+        data = YFinanceScrapper().get_data_for_ticker('^GSPC', start_date, end_date)
+        data = (data[['Date','Adj Close']]).rename({'Adj Close': 'price', 'Date': 'date'}, axis=1)
+        return data
+
