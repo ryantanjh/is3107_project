@@ -5,7 +5,7 @@ from pypfopt import expected_returns
 from pypfopt import risk_models
 
 
-def run_capm(df: pd.DataFrame):
+def get_capm_weights(df: pd.DataFrame):
     """
     Runs capm model to get portfolio weights
     :param returns_df: Dataframe of ticker log returns (wide form)
