@@ -38,17 +38,29 @@ def historical_sentiment_score_etl_pipeline():
 		create_table_sql_2 = """
 			CREATE SCHEMA IF NOT EXISTS sentiment_data;
             CREATE TABLE IF NOT EXISTS sentiment_data.weekly_sentiment (
-            	id SERIAL PRIMARY KEY,
-                start_date DATE,
+                start_date DATE PRIMARY KEY,
                 end_date DATE,
                 sentiment_score FLOAT,
                 sentiment VARCHAR
+            );
+        """
+
+		#cumulative mean table
+		create_table_sql_3 = """
+			CREATE SCHEMA IF NOT EXISTS sentiment_data;
+            CREATE TABLE IF NOT EXISTS sentiment_data.cumulative_mean_sentiment (
+            	id SERIAL PRIMARY KEY,
+                mean_daily_sentiment FLOAT,
+				num_days_daily_mean INTEGER,
+                mean_weekly_sentiment FLOAT,
+				num_days_weekly_mean INTEGER
             );
         """
 		
 		with engine.connect() as connection:
 			connection.execute(create_table_sql_1)
 			connection.execute(create_table_sql_2)
+			connection.execute(create_table_sql_3)
 
 	@task
 	def fetch_reddit_data():
@@ -128,8 +140,21 @@ def historical_sentiment_score_etl_pipeline():
 		average_sentiment_per_date['sentiment'] = average_sentiment_per_date['sentiment_score'].apply(classify_sentiment)
 		average_sentiment_per_date.to_sql('daily_sentiment',con=engine,schema='sentiment_data',if_exists='append',index=False)
 
-	create_tables()
-	reddit_data_path = fetch_reddit_data()
-	generate_and_load_sentiment_scores(reddit_data_path)
+		cume_average_sentiment = average_sentiment_per_date['sentiment_score'].mean()
+		num_days = 6
+
+		updated_cume_values = pd.DataFrame({
+										'mean_daily_sentiment': [cume_average_sentiment],
+										'num_days_daily_mean': [num_days],
+										'mean_weekly_sentiment': [0],
+										'num_days_weekly_mean': [0]
+										})
+		updated_cume_values.to_sql('cumulative_mean_sentiment', con=engine, schema='sentiment_data', if_exists='append',index=False)
+
+	create_tables_task = create_tables()
+	reddit_data_file_path = fetch_reddit_data()
+	generate_and_load_sentiment_scores_task = generate_and_load_sentiment_scores(reddit_data_file_path)
+
+	create_tables_task >> reddit_data_file_path >> generate_and_load_sentiment_scores_task
 
 run_dag = historical_sentiment_score_etl_pipeline()
