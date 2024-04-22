@@ -38,8 +38,8 @@ def historical_sentiment_score_etl_pipeline():
 		create_table_sql_2 = """
 			CREATE SCHEMA IF NOT EXISTS sentiment_data;
             CREATE TABLE IF NOT EXISTS sentiment_data.weekly_sentiment (
-                start_date DATE PRIMARY KEY,
-                end_date DATE,
+                start_date DATE,
+                end_date DATE PRIMARY KEY,
                 sentiment_score FLOAT,
                 sentiment VARCHAR
             );

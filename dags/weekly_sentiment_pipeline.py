@@ -19,8 +19,8 @@ def weekly_sentiment_score_etl_pipeline():
 		create_table_sql = """
 			CREATE SCHEMA IF NOT EXISTS sentiment_data;
             CREATE TABLE IF NOT EXISTS sentiment_data.weekly_sentiment (
-                start_date DATE PRIMARY KEY,
-                end_date DATE,
+                start_date DATE,
+                end_date DATE PRIMARY KEY,
                 sentiment_score FLOAT,
                 sentiment VARCHAR
             );
@@ -72,10 +72,10 @@ def weekly_sentiment_score_etl_pipeline():
 			connection.execute(
 				"""
 				DELETE FROM sentiment_data.weekly_sentiment
-				WHERE start_date IN (
-					SELECT start_date
+				WHERE end_date IN (
+					SELECT end_date
 					FROM sentiment_data.weekly_sentiment
-					ORDER BY start_date DESC
+					ORDER BY end_date DESC
 					LIMIT 3 OFFSET 3
 				)
 				"""
@@ -87,7 +87,7 @@ def weekly_sentiment_score_etl_pipeline():
 		get_latest_sentiment_query = """
 		SELECT sentiment_score
 		FROM sentiment_data.weekly_sentiment
-		ORDER BY start_date DESC
+		ORDER BY end_date DESC
 		LIMIT 1
 		"""
 		latest_sentiment_score = pd.read_sql(get_latest_sentiment_query,engine).iloc[0,0]
