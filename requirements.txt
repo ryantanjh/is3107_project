@@ -1,3 +1,4 @@
+pyportfolioopt==1.5.5
 beautifulsoup4==4.12.3
 pandas==2.0.3
 pydantic==2.6.4
