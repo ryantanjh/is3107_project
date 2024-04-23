@@ -8,3 +8,5 @@ statsmodels==0.14.1
 requests==2.31.0
 requests-cache==1.2.0
 yfinance==0.2.37
+praw==7.7.1
+nltk==3.8.1

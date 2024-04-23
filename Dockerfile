@@ -11,3 +11,4 @@ RUN pip install -r requirements.txt
 
 FROM apache/airflow:2.8.4
 COPY --from=cvxpy-installer /usr/local/lib/python3.8/site-packages /home/airflow/.local/lib/python3.8/site-packages
+RUN python -m nltk.downloader stopwords vader_lexicon punkt wordnet
