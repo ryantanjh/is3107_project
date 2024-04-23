@@ -6,8 +6,8 @@ from airflow import DAG
 from airflow.decorators import task
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
-from etl.yfinance_scrapper import YFinanceScrapper
-from etl.fred_scrapper import FredScapper
+from helpers.yfinance_scrapper import YFinanceScrapper
+from helpers.fred_scrapper import FredScapper
 
 with DAG('finance_data_etl',
          start_date=datetime(2024, 4, 8),
@@ -17,6 +17,7 @@ with DAG('finance_data_etl',
     Updates finance data every quarter
     """
     from sqlalchemy import create_engine
+    import pandas as pd
 
     fred_scrapper = FredScapper()
     yfinances_scrapper = YFinanceScrapper()
@@ -32,5 +33,12 @@ with DAG('finance_data_etl',
         df = fred_scrapper.get_fred_gdp(start_date=START_DATE, end_date=END_DATE).tail(1)
         df.to_sql('gdp', con=engine, schema='finance_data', if_exists='append', index=False)
 
+    @task()
+    def capm_data_etl():
+        tickers = ["XLK", "XLE", "XLV", "XLF", "XLY", "XLI"]
+        df = yfinances_scrapper.get_multiple_tickers_price(tickers, start_date=START_DATE, end_date=END_DATE).tail(1)
+        df_long = pd.melt(df, id_vars=['date'], var_name='ticker', value_name='log_return')
+        df_long.to_sql('ticker_log_returns', con=engine, schema='finance_data', if_exists='append', index=False)
 
-    gdp_etl()
+
+    gdp_etl() >> capm_data_etl()
