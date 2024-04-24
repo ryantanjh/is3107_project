@@ -62,8 +62,8 @@ def daily_sentiment_score_etl_pipeline():
 		for subreddit in listofsubreddits:
 			current_subreddit = reddit.subreddit(subreddit)
 
-		for submission in current_subreddit.hot(limit = 25):
-			posts_data.append([submission.title])
+			for submission in current_subreddit.hot(limit = 25):
+				posts_data.append([submission.title])
 
 		df = pd.DataFrame(posts_data, columns=['Title'])
 
