@@ -53,14 +53,12 @@ with DAG('backfill_dag',
             );
             CREATE TABLE IF NOT EXISTS sentiment_data.daily_sentiment (
                 date DATE PRIMARY KEY,
-                sentiment_score FLOAT,
-                sentiment VARCHAR
+                sentiment_score FLOAT
             );
             CREATE TABLE IF NOT EXISTS sentiment_data.weekly_sentiment (
                 start_date DATE,
                 end_date DATE PRIMARY KEY,
-                sentiment_score FLOAT,
-                sentiment VARCHAR
+                sentiment_score FLOAT
             );
             CREATE TABLE IF NOT EXISTS sentiment_data.cumulative_mean_sentiment (
             	id SERIAL PRIMARY KEY,
@@ -145,14 +143,6 @@ with DAG('backfill_dag',
             sentiment_score = sia.polarity_scores(sentence)
             return sentiment_score['compound']
 
-        def classify_sentiment(sentiment):
-            if sentiment > 0.05:
-                return "POSITIVE"
-            elif sentiment < -0.05:
-                return "NEGATIVE"
-            else:
-                return "NEUTRAL"
-
         df = pd.read_csv(file_path)
 
         stopwords = nltk.corpus.stopwords.words("english")
@@ -164,8 +154,6 @@ with DAG('backfill_dag',
 
         average_sentiment_per_date = df.groupby('Date')['sentiment_score'].mean().reset_index()
         average_sentiment_per_date.columns = ['date', 'sentiment_score']
-        average_sentiment_per_date['sentiment'] = average_sentiment_per_date['sentiment_score'].apply(
-            classify_sentiment)
         average_sentiment_per_date.to_sql('daily_sentiment', con=engine, schema='sentiment_data',
                                           if_exists='append', index=False)
 
