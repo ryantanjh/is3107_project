@@ -39,14 +39,6 @@ def sentiment_score_pipeline():
 		def analyze_sentiment(sentence):
 			sentiment_score = sia.polarity_scores(sentence)
 			return sentiment_score['compound']
-
-		def classify_sentiment(sentiment):
-			if sentiment > 0.05:
-				return "POSITIVE"
-			elif sentiment < -0.05:
-				return "NEGATIVE"
-			else:
-				return "NEUTRAL"
 			
 		reddit = praw.Reddit(
 	        client_id='MwjT-kwEq6x48sV78Tcw7w',
@@ -73,9 +65,9 @@ def sentiment_score_pipeline():
 		df['Sentiment'] = df['Title'].apply(analyze_sentiment)
 
 		yesterday_date = datetime.today() - timedelta(days=1)
-		new_row = [yesterday_date.date(),df['Sentiment'].mean(),classify_sentiment(df['Sentiment'].mean())]
+		new_row = [yesterday_date.date(),df['Sentiment'].mean()]
 
-		new_row_in_df = pd.DataFrame([new_row],columns=['date','sentiment_score','sentiment'])
+		new_row_in_df = pd.DataFrame([new_row],columns=['date','sentiment_score'])
 
 		new_row_in_df.to_sql('daily_sentiment',con=engine,schema='sentiment_data',if_exists='append',index=False)
 
@@ -151,14 +143,8 @@ def sentiment_score_pipeline():
 
 			weekly_sentiment_score = df['sentiment_score'].mean()
 
-			if weekly_sentiment_score > 0.05:
-				weekly_sentiment = "POSITIVE"
-			elif weekly_sentiment_score < -0.05:
-				weekly_sentiment = "NEGATIVE"
-			else:
-				weekly_sentiment = "NEUTRAL"
 			
-			new_row_in_df = pd.DataFrame([[start_of_week,end_of_week,weekly_sentiment_score,weekly_sentiment]],columns=['start_date','end_date','sentiment_score','sentiment'])
+			new_row_in_df = pd.DataFrame([[start_of_week,end_of_week,weekly_sentiment_score]],columns=['start_date','end_date','sentiment_score'])
 		
 			new_row_in_df.to_sql('weekly_sentiment',con=engine,schema='sentiment_data',if_exists='append',index=False)
 
